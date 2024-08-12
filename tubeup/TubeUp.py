@@ -399,10 +399,21 @@ class TubeUp(object):
                 print(msg)
             raise Exception(msg)
 
-        item.upload(files_to_upload, metadata=metadata, retries=9001,
-                    request_kwargs=dict(timeout=9001), delete=True,
-                    verbose=self.verbose, access_key=s3_access_key,
-                    secret_key=s3_secret_key)
+        while True:
+
+            try:
+                
+                item.upload(files_to_upload, metadata=metadata, retries=9001,
+                            request_kwargs=dict(timeout=9001), delete=True,
+                            verbose=self.verbose, access_key=s3_access_key,
+                            secret_key=s3_secret_key)
+                break
+
+            except Exception as e:
+                self.logger.error(str(e))
+                self.logger.error("Retrying...")
+                continue
+            
 
         return itemname, metadata
 
